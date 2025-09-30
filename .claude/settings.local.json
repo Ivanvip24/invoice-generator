@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/ivanvalenciaperez/Downloads/STUFF/**)",
+      "Bash(open index.html)",
+      "Bash(open:*)",
+      "Bash(base64:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
