@@ -190,10 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
-            const discountAmount = parseFloat(document.getElementById('discountAmount').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
-            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const discountFixed = parseFloat(document.getElementById('discountFixed').value) || 0;
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -214,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate PDF
-            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, discountPercent, discountFixed, discountAmount, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('PDF generated successfully!');
         } catch (error) {
@@ -283,10 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
-            const discountAmount = parseFloat(document.getElementById('discountAmount').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
-            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const discountFixed = parseFloat(document.getElementById('discountFixed').value) || 0;
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -307,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, discountPercent, discountFixed, discountAmount, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('Image generated successfully!');
         } catch (error) {
@@ -376,10 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
-            const discountAmount = parseFloat(document.getElementById('discountAmount').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
-            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const discountFixed = parseFloat(document.getElementById('discountFixed').value) || 0;
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -400,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image and copy to clipboard
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, discountPercent, discountFixed, discountAmount, total, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
 
             console.log('Image copied to clipboard successfully!');
         } catch (error) {
@@ -454,23 +445,14 @@ function calculateTotals() {
         }
     });
 
-    // Get both discount types
-    const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-    const discountFixed = parseFloat(document.getElementById('discountFixed').value) || 0;
-
-    // Calculate total discount (percentage + fixed amount)
-    const percentDiscount = subtotal * (discountPercent / 100);
-    const totalDiscount = percentDiscount + discountFixed;
-    let afterDiscount = subtotal - totalDiscount;
-
     // Check if factura is required
     const requiresFactura = document.getElementById('requiresFactura').checked;
     let ivaAmount = 0;
-    let total = afterDiscount;
+    let total = subtotal;
 
     if (requiresFactura) {
-        ivaAmount = afterDiscount * 0.16;
-        total = afterDiscount + ivaAmount;
+        ivaAmount = subtotal * 0.16;
+        total = subtotal + ivaAmount;
         document.getElementById('ivaRow').style.display = 'flex';
         document.getElementById('ivaAmount').textContent = `$${ivaAmount.toFixed(2)} MXN`;
     } else {
@@ -479,11 +461,10 @@ function calculateTotals() {
 
     // Update display
     document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)} MXN`;
-    document.getElementById('discountAmount').textContent = `$${totalDiscount.toFixed(2)} MXN`;
     document.getElementById('total').textContent = `$${total.toFixed(2)} MXN`;
 }
 
-async function generatePDF(clientName, clientPhone, date, products, subtotal, discountPercent, discountFixed, discountAmount, total, notes, requiresFactura, ivaAmount, invoiceID) {
+async function generatePDF(clientName, clientPhone, date, products, subtotal, total, notes, requiresFactura, ivaAmount, invoiceID) {
     console.log('generatePDF function called');
 
     if (!window.jspdf) {
@@ -601,7 +582,6 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, di
 
     // Calculate box height based on lines needed
     let boxHeight = 18; // Base height for subtotal + total
-    if (discountPercent > 0 || discountFixed > 0) boxHeight += 6;
     if (requiresFactura) boxHeight += 6;
 
     // White box for totals
@@ -618,21 +598,6 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, di
     let totalY = yPos + 6;
     pdf.text('Subtotal:', 130, totalY);
     pdf.text(`$${subtotal.toFixed(2)} MXN`, 185, totalY, { align: 'right' });
-
-    // Show discount if any
-    if (discountPercent > 0 || discountFixed > 0) {
-        totalY += 6;
-        let discountLabel = 'Descuento';
-        if (discountPercent > 0 && discountFixed > 0) {
-            discountLabel = `Descuento (${discountPercent}% + $${discountFixed.toFixed(2)})`;
-        } else if (discountPercent > 0) {
-            discountLabel = `Descuento (${discountPercent}%)`;
-        } else {
-            discountLabel = 'Descuento';
-        }
-        pdf.text(`${discountLabel}:`, 130, totalY);
-        pdf.text(`-$${discountAmount.toFixed(2)} MXN`, 185, totalY, { align: 'right' });
-    }
 
     // Add IVA if factura is required
     if (requiresFactura) {
@@ -769,7 +734,7 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, di
 }
 
 // Function to generate invoice as image
-async function generateImage(clientName, clientPhone, date, products, subtotal, discountPercent, discountFixed, discountAmount, total, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
+async function generateImage(clientName, clientPhone, date, products, subtotal, total, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
     console.log('generateImage function called, copyToClipboard:', copyToClipboard);
 
     // Create a temporary canvas container
@@ -848,21 +813,6 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
                         <span>$${subtotal.toFixed(2)} MXN</span>
                     </div>
     `;
-
-    if (discountPercent > 0 || discountFixed > 0) {
-        let discountLabel = 'Descuento';
-        if (discountPercent > 0 && discountFixed > 0) {
-            discountLabel = `Descuento (${discountPercent}% + $${discountFixed.toFixed(2)})`;
-        } else if (discountPercent > 0) {
-            discountLabel = `Descuento (${discountPercent}%)`;
-        }
-        invoiceHTML += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; color: #4b5563;">
-                        <span>${discountLabel}:</span>
-                        <span>-$${discountAmount.toFixed(2)} MXN</span>
-                    </div>
-        `;
-    }
 
     if (requiresFactura) {
         invoiceHTML += `

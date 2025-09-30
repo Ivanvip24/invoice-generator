@@ -118,14 +118,6 @@
             </div>
 
             <div class="totals-section">
-                <div class="discount-row">
-                    <label>Descuento (%):</label>
-                    <input type="number" id="discountPercent" min="0" max="100" value="0" step="0.1">
-                </div>
-                <div class="discount-row">
-                    <label>Descuento (cantidad fija $MXN):</label>
-                    <input type="number" id="discountFixed" min="0" value="0" step="0.01">
-                </div>
                 <div class="factura-row">
                     <label class="checkbox-label">
                         <input type="checkbox" id="requiresFactura">
@@ -148,10 +140,6 @@
                     <div class="total-row">
                         <span>Subtotal:</span>
                         <span id="subtotal">$0.00 MXN</span>
-                    </div>
-                    <div class="total-row">
-                        <span>Descuento:</span>
-                        <span id="discountAmount">$0.00 MXN</span>
                     </div>
                     <div class="total-row" id="ivaRow" style="display: none;">
                         <span>IVA (16%):</span>

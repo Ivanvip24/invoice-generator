@@ -4,7 +4,8 @@
       "Read(//Users/ivanvalenciaperez/Downloads/STUFF/**)",
       "Bash(open index.html)",
       "Bash(open:*)",
-      "Bash(base64:*)"
+      "Bash(base64:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
