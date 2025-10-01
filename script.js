@@ -1017,18 +1017,43 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
     document.body.removeChild(invoiceContainer);
 
     if (copyToClipboard) {
-        // Copy to clipboard
-        try {
-            const blob = await new Promise(resolve => canvas.toBlob(resolve));
-            await navigator.clipboard.write([
-                new ClipboardItem({
-                    'image/png': blob
-                })
-            ]);
-            alert('¡Imagen copiada al portapapeles! Puedes pegarla en WhatsApp, etc.');
-        } catch (err) {
-            console.error('Error copying to clipboard:', err);
-            alert('Error al copiar al portapapeles. Intenta descargar la imagen en su lugar.');
+        // Check if clipboard API is available (mainly for desktop browsers)
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (!isMobile && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+            // Try to copy to clipboard (works on desktop)
+            try {
+                const blob = await new Promise(resolve => canvas.toBlob(resolve));
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'image/png': blob
+                    })
+                ]);
+                alert('¡Imagen copiada al portapapeles! Puedes pegarla donde necesites.');
+            } catch (err) {
+                console.error('Error copying to clipboard:', err);
+                // Fallback to download
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `Factura_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                });
+                alert('La imagen ha sido descargada. Puedes compartirla por WhatsApp.');
+            }
+        } else {
+            // Mobile device - download the image instead
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Factura_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+            alert('La imagen ha sido descargada. Puedes compartirla por WhatsApp desde tu galería.');
         }
     } else {
         // Download as file
