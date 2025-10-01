@@ -540,7 +540,7 @@ body {
 
 .generate-btn {
     padding: 16px;
-    background: #5b6cff;
+    background: #dc143c;
     color: white;
     border: none;
     border-radius: 6px;
@@ -552,8 +552,8 @@ body {
 }
 
 .generate-btn:hover {
-    background: #4c5de6;
-    box-shadow: 0 4px 12px rgba(91, 108, 255, 0.3);
+    background: #b8112f;
+    box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
 }
 
 .generate-btn:active {
@@ -561,21 +561,21 @@ body {
 }
 
 .generate-btn-secondary {
-    background: #10b981;
+    background: #ff8c00;
 }
 
 .generate-btn-secondary:hover {
-    background: #059669;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    background: #e67e00;
+    box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
 }
 
 .generate-btn-tertiary {
-    background: #f59e0b;
+    background: #10b981;
 }
 
 .generate-btn-tertiary:hover {
-    background: #d97706;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 @media (max-width: 768px) {
