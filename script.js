@@ -716,12 +716,13 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, de
     // Deposit amount (50%)
     totalY += 8;
     pdf.setFillColor(91, 108, 255);
-    pdf.rect(125, totalY, 65, 8, 'F');
+    pdf.rect(125, totalY, 65, 12, 'F');
     pdf.setFont(undefined, 'bold');
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     pdf.setTextColor(255, 255, 255);
-    pdf.text('Cantidad a depositar (50%):', 130, totalY + 5.5);
-    pdf.text(`$${depositAmount.toFixed(2)} MXN`, 185, totalY + 5.5, { align: 'right' });
+    pdf.text('Cantidad a depositar (50%):', 157.5, totalY + 4, { align: 'center' });
+    pdf.setFontSize(11);
+    pdf.text(`$${depositAmount.toFixed(2)} MXN`, 157.5, totalY + 9, { align: 'center' });
 
     // Reset colors
     pdf.setTextColor(75, 85, 99);
@@ -941,9 +942,9 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
                         <span>Total:</span>
                         <span>$${total.toFixed(2)} MXN</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; background: #5b6cff; border-radius: 6px; font-size: 15px; font-weight: bold; color: white;">
-                        <span>Cantidad a depositar (50%):</span>
-                        <span>$${depositAmount.toFixed(2)} MXN</span>
+                    <div style="margin-top: 12px; padding: 12px; background: #5b6cff; border-radius: 6px; font-weight: bold; color: white; text-align: center;">
+                        <div style="font-size: 13px; margin-bottom: 5px;">Cantidad a depositar (50%):</div>
+                        <div style="font-size: 17px;">$${depositAmount.toFixed(2)} MXN</div>
                     </div>
                 </div>
             </div>
