@@ -564,7 +564,7 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, de
     pdf.setFontSize(16);
     pdf.setFont(undefined, 'bold');
     pdf.setTextColor(44, 62, 80);
-    pdf.text('FACTURA', 190, 22, { align: 'right' });
+    pdf.text('RECIBO', 190, 22, { align: 'right' });
 
     // Invoice ID
     pdf.setFontSize(9);
@@ -865,7 +865,7 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
                     <h1 style="font-size: 32px; color: #1e40af; margin: 0; font-weight: bold;">VT Anunciando</h1>
                 </div>
                 <div style="text-align: right;">
-                    <h2 style="font-size: 20px; color: #2c3e50; margin: 0 0 5px 0; font-weight: bold;">FACTURA</h2>
+                    <h2 style="font-size: 20px; color: #2c3e50; margin: 0 0 5px 0; font-weight: bold;">RECIBO</h2>
                     <p style="font-size: 12px; color: #6b7280; margin: 0;">ID: ${invoiceID}</p>
                 </div>
             </div>
