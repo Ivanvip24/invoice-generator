@@ -188,6 +188,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Calculate total quantity for delivery charge
+            let totalQuantity = 0;
+            selectedProducts.forEach(p => totalQuantity += p.quantity);
+
+            // Calculate delivery charge
+            let deliveryCharge = 0;
+            let deliveryText = '';
+            if (totalQuantity < 300 && totalQuantity > 0) {
+                deliveryCharge = 210;
+                deliveryText = `$${deliveryCharge.toFixed(2)} MXN`;
+            } else if (totalQuantity >= 300) {
+                deliveryCharge = 0;
+                deliveryText = 'Gratis';
+            }
+
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
@@ -211,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate PDF
-            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('PDF generated successfully!');
         } catch (error) {
@@ -278,6 +293,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Calculate total quantity for delivery charge
+            let totalQuantity = 0;
+            selectedProducts.forEach(p => totalQuantity += p.quantity);
+
+            // Calculate delivery charge
+            let deliveryCharge = 0;
+            let deliveryText = '';
+            if (totalQuantity < 300 && totalQuantity > 0) {
+                deliveryCharge = 210;
+                deliveryText = `$${deliveryCharge.toFixed(2)} MXN`;
+            } else if (totalQuantity >= 300) {
+                deliveryCharge = 0;
+                deliveryText = 'Gratis';
+            }
+
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
@@ -301,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('Image generated successfully!');
         } catch (error) {
@@ -368,6 +398,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Calculate total quantity for delivery charge
+            let totalQuantity = 0;
+            selectedProducts.forEach(p => totalQuantity += p.quantity);
+
+            // Calculate delivery charge
+            let deliveryCharge = 0;
+            let deliveryText = '';
+            if (totalQuantity < 300 && totalQuantity > 0) {
+                deliveryCharge = 210;
+                deliveryText = `$${deliveryCharge.toFixed(2)} MXN`;
+            } else if (totalQuantity >= 300) {
+                deliveryCharge = 0;
+                deliveryText = 'Gratis';
+            }
+
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
@@ -391,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image and copy to clipboard
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, total, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
 
             console.log('Image copied to clipboard successfully!');
         } catch (error) {
@@ -433,26 +478,47 @@ function updatePriceDisplay(input) {
 
 function calculateTotals() {
     let subtotal = 0;
+    let totalQuantity = 0;
 
-    // Calculate subtotal from all product inputs with auto-price
+    // Calculate subtotal and total quantity from all product inputs with auto-price
     const productInputs = document.querySelectorAll('.auto-price');
     productInputs.forEach(input => {
         const quantity = parseInt(input.value) || 0;
         if (quantity > 0) {
+            totalQuantity += quantity;
             const tiersData = input.dataset.tiers;
             const unitPrice = calculatePriceForQuantity(quantity, tiersData);
             subtotal += quantity * unitPrice;
         }
     });
 
+    // Calculate delivery charge
+    let deliveryCharge = 0;
+    const deliveryAmountSpan = document.getElementById('deliveryAmount');
+
+    if (totalQuantity < 300 && totalQuantity > 0) {
+        deliveryCharge = 210;
+        deliveryAmountSpan.textContent = `$${deliveryCharge.toFixed(2)} MXN`;
+        deliveryAmountSpan.style.color = '#2c3e50';
+        deliveryAmountSpan.style.textDecoration = 'none';
+    } else if (totalQuantity >= 300) {
+        deliveryCharge = 0;
+        deliveryAmountSpan.innerHTML = '<span style="text-decoration: line-through; color: #9ca3af;">$210.00 MXN</span> <span style="color: #10b981; font-weight: 700;">Gratis</span>';
+    } else {
+        deliveryAmountSpan.textContent = '$0.00 MXN';
+        deliveryAmountSpan.style.color = '#2c3e50';
+        deliveryAmountSpan.style.textDecoration = 'none';
+    }
+
     // Check if factura is required
     const requiresFactura = document.getElementById('requiresFactura').checked;
     let ivaAmount = 0;
-    let total = subtotal;
+    let subtotalWithDelivery = subtotal + deliveryCharge;
+    let total = subtotalWithDelivery;
 
     if (requiresFactura) {
-        ivaAmount = subtotal * 0.16;
-        total = subtotal + ivaAmount;
+        ivaAmount = subtotalWithDelivery * 0.16;
+        total = subtotalWithDelivery + ivaAmount;
         document.getElementById('ivaRow').style.display = 'flex';
         document.getElementById('ivaAmount').textContent = `$${ivaAmount.toFixed(2)} MXN`;
     } else {
@@ -464,7 +530,7 @@ function calculateTotals() {
     document.getElementById('total').textContent = `$${total.toFixed(2)} MXN`;
 }
 
-async function generatePDF(clientName, clientPhone, date, products, subtotal, total, notes, requiresFactura, ivaAmount, invoiceID) {
+async function generatePDF(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, notes, requiresFactura, ivaAmount, invoiceID) {
     console.log('generatePDF function called');
 
     if (!window.jspdf) {
@@ -581,7 +647,7 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, to
     yPos += 5;
 
     // Calculate box height based on lines needed
-    let boxHeight = 18; // Base height for subtotal + total
+    let boxHeight = 24; // Base height for subtotal + delivery + total
     if (requiresFactura) boxHeight += 6;
 
     // White box for totals
@@ -598,6 +664,28 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, to
     let totalY = yPos + 6;
     pdf.text('Subtotal:', 130, totalY);
     pdf.text(`$${subtotal.toFixed(2)} MXN`, 185, totalY, { align: 'right' });
+
+    // Add delivery charge
+    totalY += 6;
+    pdf.text('Envío:', 130, totalY);
+    if (deliveryText === 'Gratis') {
+        pdf.setTextColor(150, 150, 150);
+        pdf.text('$210.00 MXN', 185, totalY, { align: 'right' });
+        // Draw strikethrough
+        const textWidth = pdf.getTextWidth('$210.00 MXN');
+        pdf.setDrawColor(150, 150, 150);
+        pdf.setLineWidth(0.3);
+        pdf.line(185 - textWidth, totalY - 1, 185, totalY - 1);
+        // Add "Gratis" in green
+        pdf.setTextColor(16, 185, 129);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('Gratis', 185, totalY + 4, { align: 'right' });
+        pdf.setFont(undefined, 'normal');
+        pdf.setTextColor(75, 85, 99);
+        totalY += 4;
+    } else {
+        pdf.text(deliveryText, 185, totalY, { align: 'right' });
+    }
 
     // Add IVA if factura is required
     if (requiresFactura) {
@@ -734,7 +822,7 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, to
 }
 
 // Function to generate invoice as image
-async function generateImage(clientName, clientPhone, date, products, subtotal, total, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
+async function generateImage(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
     console.log('generateImage function called, copyToClipboard:', copyToClipboard);
 
     // Create a temporary canvas container
@@ -811,6 +899,10 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; color: #4b5563;">
                         <span>Subtotal:</span>
                         <span>$${subtotal.toFixed(2)} MXN</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; color: #4b5563;">
+                        <span>Envío:</span>
+                        <span>${deliveryText === 'Gratis' ? '<span style="text-decoration: line-through; color: #9ca3af;">$210.00 MXN</span> <span style="color: #10b981; font-weight: 700;">Gratis</span>' : deliveryText}</span>
                     </div>
     `;
 

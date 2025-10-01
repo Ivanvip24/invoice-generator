@@ -5,7 +5,13 @@
       "Bash(open index.html)",
       "Bash(open:*)",
       "Bash(base64:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
