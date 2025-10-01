@@ -579,6 +579,11 @@ body {
 }
 
 @media (max-width: 768px) {
+    /* Hide copy button on mobile devices */
+    .desktop-only {
+        display: none !important;
+    }
+
     body {
         padding: 20px 10px;
     }
