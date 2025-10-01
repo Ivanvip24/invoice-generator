@@ -842,36 +842,6 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, de
     pdf.save(fileName);
 }
 
-// Fallback function for copying/downloading when share API is not available
-async function fallbackCopyOrDownload(canvas, invoiceID, clientName) {
-    // Try clipboard API (works well on desktop, limited on mobile)
-    if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-        try {
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            await navigator.clipboard.write([
-                new ClipboardItem({
-                    'image/png': blob
-                })
-            ]);
-            alert('¡Imagen copiada al portapapeles! Puedes pegarla donde necesites.');
-            return;
-        } catch (err) {
-            console.error('Error copying to clipboard:', err);
-        }
-    }
-
-    // Fallback to download
-    canvas.toBlob(function(blob) {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Factura_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
-        link.click();
-        URL.revokeObjectURL(url);
-    });
-    alert('La imagen ha sido descargada. Puedes compartirla por WhatsApp desde tu galería.');
-}
-
 // Function to generate invoice as image
 async function generateImage(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, depositAmount, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
     console.log('generateImage function called, copyToClipboard:', copyToClipboard);
@@ -1046,42 +1016,58 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
     // Remove temporary container
     document.body.removeChild(invoiceContainer);
 
+    // Convert canvas to blob
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+
     if (copyToClipboard) {
-        // Try Web Share API first (best for mobile)
-        if (navigator.share) {
-            try {
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                const file = new File([blob], `Factura_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`, { type: 'image/png' });
+        // Check if we're on mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-                await navigator.share({
-                    files: [file],
-                    title: 'Recibo de Pedido',
-                    text: 'Recibo de pedido VT Anunciando'
-                });
-
-                console.log('Image shared successfully');
-            } catch (err) {
-                // User cancelled share or error occurred
-                if (err.name !== 'AbortError') {
-                    console.error('Error sharing:', err);
-                    // Fallback to clipboard or download
-                    await fallbackCopyOrDownload(canvas, invoiceID, clientName);
-                }
-            }
-        } else {
-            // No share API, try clipboard or download
-            await fallbackCopyOrDownload(canvas, invoiceID, clientName);
-        }
-    } else {
-        // Download as file
-        canvas.toBlob(function(blob) {
+        if (isMobile) {
+            // On mobile: download the image so user can share from gallery
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Factura_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+            link.download = `Recibo_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
             URL.revokeObjectURL(url);
-        });
+            alert('✅ Imagen guardada. Puedes encontrarla en tu galería y compartirla por WhatsApp.');
+        } else {
+            // On desktop: try to copy to clipboard
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        'image/png': blob
+                    })
+                ]);
+                alert('✅ Imagen copiada al portapapeles. Puedes pegarla donde necesites.');
+            } catch (err) {
+                console.error('Error copying to clipboard:', err);
+                // Fallback to download
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Recibo_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                alert('✅ Imagen descargada. Puedes compartirla desde tu carpeta de descargas.');
+            }
+        }
+    } else {
+        // Normal download mode (for "Recibo Imagen" button)
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Recibo_${invoiceID}_${clientName.replace(/\s+/g, '_')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        alert('✅ Imagen descargada exitosamente.');
     }
 }
 
