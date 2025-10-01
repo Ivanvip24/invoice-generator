@@ -42,6 +42,45 @@ body {
     letter-spacing: -0.5px;
 }
 
+.instructions-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 30px;
+    margin: 0 40px 25px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.instructions-section h2 {
+    color: white;
+    font-size: 1.3em;
+    margin: 0 0 20px 0;
+    text-align: center;
+    font-weight: 700;
+}
+
+.instructions-list {
+    background: white;
+    padding: 25px 25px 25px 45px;
+    border-radius: 6px;
+    margin: 0;
+    line-height: 1.8;
+}
+
+.instructions-list li {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 0.95em;
+}
+
+.instructions-list li:last-child {
+    margin-bottom: 0;
+}
+
+.instructions-list strong {
+    color: #5b6cff;
+    font-weight: 700;
+}
+
 .invoice-form {
     padding: 40px;
 }
@@ -549,6 +588,24 @@ body {
         font-size: 1.2em;
     }
 
+    .instructions-section {
+        margin: 0 20px 20px 20px;
+        padding: 20px;
+    }
+
+    .instructions-section h2 {
+        font-size: 1.1em;
+    }
+
+    .instructions-list {
+        padding: 20px 20px 20px 35px;
+    }
+
+    .instructions-list li {
+        font-size: 0.85em;
+        margin-bottom: 10px;
+    }
+
     .invoice-form {
         padding: 20px;
     }
@@ -708,6 +765,25 @@ body {
 
     .header h1 {
         font-size: 1.1em;
+    }
+
+    .instructions-section {
+        margin: 0 15px 15px 15px;
+        padding: 15px;
+    }
+
+    .instructions-section h2 {
+        font-size: 1em;
+        margin-bottom: 15px;
+    }
+
+    .instructions-list {
+        padding: 15px 15px 15px 30px;
+    }
+
+    .instructions-list li {
+        font-size: 0.8em;
+        margin-bottom: 8px;
     }
 
     .invoice-form {
