@@ -206,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
+            const depositAmount = parseFloat(document.getElementById('depositAmount').textContent.replace(/[^0-9.]/g, ''));
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -226,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate PDF
-            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generatePDF(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, depositAmount, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('PDF generated successfully!');
         } catch (error) {
@@ -311,6 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
+            const depositAmount = parseFloat(document.getElementById('depositAmount').textContent.replace(/[^0-9.]/g, ''));
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -331,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, depositAmount, orderNotes, requiresFactura, ivaAmount, invoiceID);
 
             console.log('Image generated successfully!');
         } catch (error) {
@@ -416,6 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get totals
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace(/[^0-9.]/g, ''));
             const total = parseFloat(document.getElementById('total').textContent.replace(/[^0-9.]/g, ''));
+            const depositAmount = parseFloat(document.getElementById('depositAmount').textContent.replace(/[^0-9.]/g, ''));
 
             // Check if factura/IVA is required
             const requiresFactura = document.getElementById('requiresFactura').checked;
@@ -436,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Invoice ID:', invoiceID);
 
             // Generate Image and copy to clipboard
-            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
+            await generateImage(clientName, clientPhone, formattedDate, selectedProducts, subtotal, deliveryCharge, deliveryText, total, depositAmount, orderNotes, requiresFactura, ivaAmount, invoiceID, true);
 
             console.log('Image copied to clipboard successfully!');
         } catch (error) {
@@ -525,12 +528,16 @@ function calculateTotals() {
         document.getElementById('ivaRow').style.display = 'none';
     }
 
+    // Calculate 50% deposit
+    const depositAmount = total * 0.5;
+
     // Update display
     document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)} MXN`;
     document.getElementById('total').textContent = `$${total.toFixed(2)} MXN`;
+    document.getElementById('depositAmount').textContent = `$${depositAmount.toFixed(2)} MXN`;
 }
 
-async function generatePDF(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, notes, requiresFactura, ivaAmount, invoiceID) {
+async function generatePDF(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, depositAmount, notes, requiresFactura, ivaAmount, invoiceID) {
     console.log('generatePDF function called');
 
     if (!window.jspdf) {
@@ -706,6 +713,20 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, de
     pdf.text('Total:', 130, totalY + 2);
     pdf.text(`$${total.toFixed(2)} MXN`, 185, totalY + 2, { align: 'right' });
 
+    // Deposit amount (50%)
+    totalY += 8;
+    pdf.setFillColor(91, 108, 255);
+    pdf.rect(125, totalY, 65, 8, 'F');
+    pdf.setFont(undefined, 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text('Cantidad a depositar (50%):', 130, totalY + 5.5);
+    pdf.text(`$${depositAmount.toFixed(2)} MXN`, 185, totalY + 5.5, { align: 'right' });
+
+    // Reset colors
+    pdf.setTextColor(75, 85, 99);
+    pdf.setFont(undefined, 'normal');
+
     // Notes section (if provided)
     let bankingY = totalY + 20;
     if (notes && notes.trim()) {
@@ -822,7 +843,7 @@ async function generatePDF(clientName, clientPhone, date, products, subtotal, de
 }
 
 // Function to generate invoice as image
-async function generateImage(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
+async function generateImage(clientName, clientPhone, date, products, subtotal, deliveryCharge, deliveryText, total, depositAmount, notes, requiresFactura, ivaAmount, invoiceID, copyToClipboard = false) {
     console.log('generateImage function called, copyToClipboard:', copyToClipboard);
 
     // Create a temporary canvas container
@@ -919,6 +940,10 @@ async function generateImage(clientName, clientPhone, date, products, subtotal, 
                     <div style="display: flex; justify-content: space-between; padding-top: 10px; margin-top: 10px; border-top: 2px solid #e5e7eb; font-size: 16px; font-weight: bold; color: #2c3e50;">
                         <span>Total:</span>
                         <span>$${total.toFixed(2)} MXN</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 12px; padding: 12px; background: #5b6cff; border-radius: 6px; font-size: 15px; font-weight: bold; color: white;">
+                        <span>Cantidad a depositar (50%):</span>
+                        <span>$${depositAmount.toFixed(2)} MXN</span>
                     </div>
                 </div>
             </div>

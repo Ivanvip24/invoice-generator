@@ -522,6 +522,16 @@ body {
     border-top: 2px solid #e1e4e8;
 }
 
+.deposit-row {
+    background: #5b6cff;
+    color: white;
+    padding: 15px 12px !important;
+    margin-top: 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.05em;
+}
+
 .button-group {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
